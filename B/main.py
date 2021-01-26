@@ -23,7 +23,7 @@ def main():
     scl_lcd = 3                 
 
     mp1, mp2, mp3, mp4 = OD(18), OD(23), OD(24), OD(25)
-
+    step_pins = [mp1, mp2, mp3, mp4]
     Seq = [
         [1,0,0,0],
         [1,1,0,0],
@@ -35,6 +35,8 @@ def main():
         [1,0,0,1]
     ]
     step_count = len(seq)
+    stepDir = 1
+    step_counter = 0
 
     speel = True
     punten = 0
@@ -50,6 +52,17 @@ def main():
 
             #Start speel loop
             while Speel:
+
+                #Prints voor debuging
+                print(step_counter)
+                print(seq[step_count])
+
+                #restart de sequence
+                if (step_counter>=step_count):
+                    step_counter 0
+                if (step_counter<0):
+                    step_counter = step_count+stepDir
+
                 stop_tijd = False
                 tijd = Thread(target=timer, args=(lambda: stop_tijd,))
                 kleur = random.choice(["groen", "rood"])    #Selecteer een willikeurige kleur
@@ -65,9 +78,18 @@ def main():
                     if kleur == "groen":
                         stop_tijd = True    # stop de tijd
                         punten += 1         # Voeg een punt to aan totaal
-                        mp1.on()
-                        timer()
-                        mp1.off()
+                        # mp1.on()
+                        # timer()
+                        # mp1.off()
+
+                        for pin in range(0, 4):
+                            xpin = step_pins[pin]
+                            if Seq[step_counter][pin] != 0:
+                                xpin.on()
+                            else:
+                                xpin.off()
+                        step_counter += stepDir
+
                         groen_kleur.off()
                     else:
                         print("Verkeerd antwoord.")
@@ -83,9 +105,18 @@ def main():
                     if kleur == "rood":
                         stop_tijd = True    # stop de tijd
                         punten += 1         # Voeg een punt to aan totaal
-                        mp1.on()
-                        timer()
-                        mp1.off()
+                        # mp1.on()
+                        # timer()
+                        # mp1.off()
+
+                        for pin in range(0, 4):
+                            xpin = step_pins[pin]
+                            if Seq[step_counter][pin] != 0:
+                                xpin.on()
+                            else:
+                                xpin.off()
+                        step_counter += stepDir
+                        
                         print("Goed antwoord")
                     else:
                         print("Verkeerd antwoord.")
@@ -102,3 +133,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
