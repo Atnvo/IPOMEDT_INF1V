@@ -1,9 +1,15 @@
-from gpiozero import LED, Button, Motor, OutputDevice as Step
+from gpiozero import LED, Button, Motor, OutputDevice as OD
 from time import sleep
 import random
 
-def game_loop():
-    print("game loop")
+
+# Timer functie die aangeroepen word als een aparte thread bij een kleur verandering.
+def timer():
+    for i in range(random.randint(2, 5)):
+        if stop():
+            break
+        sleep(1)
+    sys.exit("Te laat. Probeer opnieuw")
 
 def main():
     #Init variablen voor gebruik in game loop
@@ -16,18 +22,22 @@ def main():
     sda_lcd = 2                 # LCD scherm
     scl_lcd = 3                 
 
-    mp1, mp2, mp3, mp4 = Step(18), Step(23), Step(24), Step(25)
+    mp1, mp2, mp3, mp4 = OD(18), OD(23), OD(24), OD(25)
+
+    Seq = [
+        [1,0,0,0],
+        [1,1,0,0],
+        [0,1,0,0],
+        [0,1,1,0],
+        [0,0,1,0],
+        [0,0,1,1],
+        [0,0,0,1],
+        [1,0,0,1]
+    ]
+    step_count = len(seq)
 
     speel = True
     punten = 0
-
-    # Timer functie die aangeroepen word als een aparte thread bij een vraag.
-    def timer():
-        for i in range(random.randint(2, 5)):
-            if stop():
-                break
-            sleep(1)
-        sys.exit("Te laatte invoer. Probeer opnieuw")
     
     # Start het spel op door de blauw knop te drukken
     if blauwe_knop.is_pressed:
@@ -40,6 +50,7 @@ def main():
 
             #Start speel loop
             while Speel:
+                stop_tijd = False
                 tijd = Thread(target=timer, args=(lambda: stop_tijd,))
                 kleur = random.choice(["groen", "rood"])    #Selecteer een willikeurige kleur
                 if kleur == "rood":
@@ -50,12 +61,12 @@ def main():
 
                 # Groen knop invoer event.
                 # Checked als de kleur rood is en voegt punten toe.
-                if groen_kleur.is_pressed:
+                if groene_knop.is_pressed:
                     if kleur == "groen":
                         stop_tijd = True    # stop de tijd
                         punten += 1         # Voeg een punt to aan totaal
                         mp1.on()
-                        timer(2)
+                        timer()
                         mp1.off()
                         groen_kleur.off()
                     else:
@@ -68,12 +79,12 @@ def main():
                 
                 # Rood knop invoer event.
                 # Checked als de kleur rood is en voegt punten toe.
-                elif rood_kleur.is_pressed:
+                elif rode_knop.is_pressed:
                     if kleur == "rood":
                         stop_tijd = True    # stop de tijd
                         punten += 1         # Voeg een punt to aan totaal
                         mp1.on()
-                        timer(2)
+                        timer()
                         mp1.off()
                         print("Goed antwoord")
                     else:
@@ -88,7 +99,6 @@ def main():
             print("Verkeerd invoer")
     else:
         print("Druk op de bluawe knop om het spel te starten")
-            
 
 if __name__ == "__main__":
     main()
