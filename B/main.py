@@ -5,11 +5,11 @@ import datetime
 
 def main():
     # Init variablen voor gebruik in game loop
-    rode_knop = Button(14)      # Groene Knop
-    groene_knop = Button(15)    # Rode knop
-    blauwe_knop = Button(4)     # Start knop
-    groen_lamp = LED(22)        # Groen LED Kleur
-    rood_lamp = LED(27)         # Rood LED Kleur       
+    r_knop = Button(14)         # Groene Knop
+    g_knop = Button(15)         # Rode knop
+    b_knop = Button(4)          # Start knop
+    g_lamp = LED(22)            # Groen LED Kleur
+    r_lamp = LED(27)            # Rood LED Kleur       
     led = LED(22)               # led lampje
     sda_lcd = 2                 # LCD scherm
     scl_lcd = 3                 
@@ -39,6 +39,19 @@ def main():
     step_rechts = -1
     step_counter = 0
     
+#LCD scherm aanmaken
+    lcd_rs        = 25 
+    lcd_en        = 24
+    lcd_d4        = 23
+    lcd_d5        = 17
+    lcd_d6        = 18
+    lcd_d7        = 22
+    lcd_backlight = 4
+    lcd_columns = 16
+    lcd_rows = 2
+
+    lcd = LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_columns, lcd_rows, lcd_backlight)    
+    
     speel = True
     punten = 0
     start = True
@@ -47,19 +60,24 @@ def main():
     moeilijker = 2              #na dit aantal rondes wordt het spel moeilijker
     teller = 0                  #hoeveelste ronde waar het programma in zit
     maximale_tijd = 1000        #begint met 1 seconde, steeds korter. In milliseconden.
-
+    
     while start:
         delay = 1000
         
+        lcd.message("Begin met blauw/nPunten: 0")
+        
         print("Begin spel. Druk op de blauwe knop.")
 
-        if blauwe_knop.is_pressed:
-            groen_lamp.on()
+        if b_knop.is_pressed:
+            g_lamp.on()
 
-            if groene_knop.is_pressed:              #Groene lamp klik event
-                groen_lamp.off()                    #Groene lamp uit
-                sleep(2)
-                mp1.off()
+            if g_knop.is_pressed:              #Groene lamp klik event
+                g_lamp.off()                    #Groene lamp uit
+
+                for halfstep in range(8):
+                    for pin in range(4):
+                    GPIO.output(control_pins[pin], seq[halfstep][pin])
+                    sleep(0.001)
 
                 #Start speel loop
                 while speel:
@@ -72,50 +90,52 @@ def main():
                     kleur = random.choice(["groen", "rood"])    #Selecteer een willekeurige kleur
     
                     if kleur == "rood":
-                        rood_lamp.on()
-                        print("rodel lamp")
+                        r_lamp.on()
+                        print("rode lamp")
                     else:
-                        groen_lamp.on()
-                        print("groelne lamp")
+                        g_lamp.on()
+                        print("groene lamp")
                     
                     press = datetime.datetime.now()
 
                     # Groen knop invoer event.
-                    # Checkt of de kleur rood is en voegt punten toe.
-                    if groene_knop.is():
+                    if g_knop.is_pressed():
                         mp1.on()        #start de motor voor 2 seconden en stop
                         sleep(2)
                         mp1.off()
                         
                         # check als de kleur overheen komt met de de gedrukte knop
                         if kleur == "groen":
-
+                            
+                            # Motor systeem versie 2
                             for halfstep in range(8):
                                 for pin in range(4):
                                 GPIO.output(control_pins[pin], seq[halfstep][pin])
-                                time.sleep(0.001)
+                                sleep(0.001)
 
-                            groen_lamp.off()
+                            g_lamp.off()
                             print("Goed antwoord")
-                            #change time
+                            #change time 
                             change = datetime.datetime.now()
                         else:
-                            print("Verkeerd antwoord.")
-                            groen_lamp.off()
-                            rood_lamp.off()
+                            lcd.clear()
+                            lcd.message("Game over")
+                            g_lamp.off()
+                            r_lamp.off()
                             speel = False
                             print(f"Totaal aantal goed: "+str(punten))   # Toon aantal goed beantwoord
                             break               #Stop het spel door verkeerd antwoord
                     
                     # Rood knop invoer event.
                     # Checked als de kleur rood is en voegt punten toe.
-                    elif rode_knop.is_pressed:
-#moet nog veranderd
+                    elif r_knop.is_pressed:
+                        #moet nog veranderd worden
                         mp1.on()
                         sleep(2)
                         mp1.off()
                         if kleur == "rood":
 
+                            # Motor systeem versie 1
                             for pin in range(0, 4):
                                xpin = step_pins[pin]
                                if Seq[step_counter][pin] != 0:
@@ -124,15 +144,16 @@ def main():
                                    xpin.off()
                             step_counter += step_rechts
                             
-                            rood_lamp.off()
+                            r_lamp.off()
                             print("Goed antwoord")
                             #change time
                             change = datetime.datetime.now()
                         else:
-                            print("Verkeerd antwoord.")
-                            groen_lamp.off()
-                            rood_lamp.off()
+                            g_lamp.off()
+                            r_lamp.off()
                             speel = False
+                            lcd.clear()
+                            lcd.message("Game over")
                             print(f"Totaal aantal goed: "+str(punten))   #aantal toont goed beantwoorde/Toon aantal goed beantwoord
                         break                                       #Stolp het splel door verkeerd antwoord
 
@@ -145,13 +166,12 @@ def main():
                 else:       
                     #Iets ging fout. Kom niet in de spel loop.
                     print("Verkeerde invoer. Gebruiker komt niet in speel loop.")
-                    print("-----")
                     sleep(2)
                 
             #PUNTEN BEREKENINGING.
-            if groene_knop.is_pressed or rode_knop.is_pressed:          #Groen of rood ingedrukt
-                                                      #change_milli = change in microseconden/milliseconden
-                diff = press - change                 #Verschil tussen press_milli en change_milli in microseconden/milliseconden
+            if kleur = "rood" or kleur = "groen":          #Groen of rood ingedrukt
+                                                      
+                diff = press - change                 #Verschil tussen press en change in microseconden/milliseconden
                 millisec = (diff.days * 24 * 60 * 60 + diff.seconds) * 1000 + diff.microseconds / 1000.0 # Stackoverflow ;-; Het werkt :o
                 print("Hoelang je erover deed: " + millisec)
 
@@ -160,8 +180,12 @@ def main():
             if millisec <= maximale_tijd:
                 punten_lijst = []
                 punten_lijst.append(millisec)
+                lcd.clear()
+                lcd.message("Punten: " + str(sum(punten_lijst)))
                 print(sum(punten_lijst))
-
+            else:
+                lcd.clear()
+                lcd.message("Game over")
         else:
             print("Spel niet gestart")
 
