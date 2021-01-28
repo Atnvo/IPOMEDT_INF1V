@@ -59,7 +59,6 @@ class GameState():
         self.hitboxes
         self.note_dropper.drop(note, self.hitboxes)
 
-
     def get_background(self):
         return self.background_handler.background
 

@@ -80,9 +80,9 @@ def main():
                     startButton.check_click()
                     quitButton.check_click()
                     # Difficulty buttons
-                    easyButton.check_click()
-                    normalButton.check_click()
-                    hardButton.check_click()
+                    # easyButton.check_click()
+                    # normalButton.check_click()
+                    # hardButton.check_click()
 
         # This runs when the users starts a game
         elif game_state.state == 'playing':
@@ -110,31 +110,33 @@ def main():
                             button.wake()  # Set the button as available again
                             hitbox.unpunch()
 
-        elif game_state.state == 'end_game':
-            end_screen()
-
-        # # End state
         # elif game_state.state == 'end_game':
-        #     replayButton = Button(500, 500, 200, 45, ' Replay', game_state.restart, song.get_font_filename(), allsprites, game_state)
-        #     mainMenuButton = Button(650, 500, 200, 45, ' Main menu', game_state.menu_start, song.get_font_filename(), allsprites, game_state)
+        #     going = False
+        #     end_screen()
+
+        # End state
+        elif game_state.state == 'end_game':
+            replayButton = Button(500, 500, 200, 45, ' Replay', game_state.restart, song.get_font_filename(), allsprites, game_state)
+            mainMenuButton = Button(650, 500, 200, 45, ' Main menu', game_state.menu_start, song.get_font_filename(), allsprites, game_state)
             
-        #     top5 = score.get_top5_high_score()
+            top5 = score.get_top5_high_score()
+            text_font.render_to(screen, (500, 200), "Score:", (153, 204, 255))
 
-        #     text_font.render_to(screen, (590, 200), "Highscores:", (153, 204, 255))
-        #     # [90, 70, 65, 60, 60]
+            text_font.render_to(screen, (500, 250), str(score.get_score()), (153, 204, 255))
+            # [90, 70, 65, 60, 60]
 
-        #     for event in eventlist:
-        #         # Checks if a mouse is clicked 
-        #         if event.type == pygame.MOUSEBUTTONDOWN: 
-        #             replayButton.check_click()
-        #             mainMenuButton.check_click()
-        #             quitButton.check_click()
+            for event in eventlist:
+                # Checks if a mouse is clicked 
+                if event.type == pygame.MOUSEBUTTONDOWN: 
+                    replayButton.check_click()
+                    mainMenuButton.check_click()
+                    quitButton.check_click()
 
         # text_font.render_to(screen, (40, 350), "Hello World!", (0, 0, 0))
 
         # This calls the update() function on all sprites
         allsprites.update()
-        
+        pygame.display.flip()
         # Draw Everything
         screen.blit(game_state.get_background(), (0, 0))  # First draw a new background
         allsprites.draw(screen)  # Next draw all updated sprites

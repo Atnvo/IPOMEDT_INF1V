@@ -37,6 +37,9 @@ class ScoreHandler(sprite.Sprite):
         self.score_text = self.font.render('Score: ' + str(self.score), 1, (10, 10, 10))
         return self.score_text, self.score_text_pos
 
+    def get_score(self):
+        return self.score
+
     # This is called every frame
     def update(self):
         if self.game_state.state == 'playing':

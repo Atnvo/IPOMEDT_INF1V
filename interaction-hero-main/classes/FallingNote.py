@@ -12,7 +12,6 @@ class FallingNote(pygame.sprite.Sprite):
         
         self.lane_index = lane_i
         self.image, self.rect = load_image(random.choice(["vijand-1.png", "vijand-2.png", "vijnand-3.png", "vijand-5.png"]), -1)
-        self.image, self.rect = load_image(random.choice(["musicnote-example.png", "hitbox-example.png"]), -1)
         screen = pygame.display.get_surface()
         self.area = screen.get_rect()  # ONLY USE THIS TO CHECK IT HAS FALLEN OF SCREEN
         self.rect.topleft = self._new_start_pos()
