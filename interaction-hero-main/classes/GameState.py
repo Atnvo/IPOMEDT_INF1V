@@ -54,7 +54,6 @@ class GameState():
         self.scoreHandler.restart()
         self.music_player.restart()
 
-
     def drop_next_note_sprite(self, note):
         self.note_dropper.drop(note, self.hitboxes)
 
@@ -82,6 +81,7 @@ class GameState():
                 # After some time assume no more notes are dropping
                 if self.wait_untill_notes_gone < time.get_ticks():
                     self.notes_are_dropping = False
+                    self.state = "end_game"
             # Otherwise (when song is not finished) keep updating
             else:
                 self.music_player.update()
@@ -90,7 +90,10 @@ class GameState():
         elif self.state == 'prestart':
             return
 
-
+    def menu_start(self):
+        self.background_handler.update_background()
+        self.state = 'prestart'
+        
     def check_for_hit(self, hitbox):
         if hitbox.hits():
             self.scoreHandler.change_score(10)

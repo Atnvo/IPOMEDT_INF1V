@@ -64,6 +64,16 @@ class ScoreHandler(sprite.Sprite):
                 if songname == played_song and (best_score == None or songscore > best_score):
                     best_score = songscore
         return best_score
+
+    def get_top5_high_score():
+        best_scores = []
+        with open('scores.txt', 'r') as f:
+            scores = f.read().splitlines(False)
+            for score in scores:
+                songdata = score.split(' ')
+                best_scores.append(int(songdata[1]))
+                best_scores = sorted(best_scores, reverse=True)
+        return best_scores[:5]
     
     def save_score(self):
         self.score_is_saved = True

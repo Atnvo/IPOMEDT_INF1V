@@ -1,6 +1,9 @@
 # General imports
+from classes.FallingNote import FallingNote
 import pygame, utils, os
 from classes.GameState import GameState
+from classes.ScoreHandler import ScoreHandler as score
+import classes.ScoreHandler
 from classes.Button import Button
 import song_library
 
@@ -12,9 +15,10 @@ def main():
     screen = pygame.display.set_mode((1280, 720))
     # Set the window title
     pygame.display.set_caption("IAT Challengeweek: Interaction Hero | China")
-
+        
     # Keeps track of all sprites to be updated every frame
     allsprites = pygame.sprite.Group()
+
 
     # Song to be used in game. Only one can be used.
     song = song_library.example_song_short  # Short random song for debugging
@@ -40,6 +44,10 @@ def main():
     startButton = Button(500, 300, 140, 40, ' Start', game_state.restart, song.get_font_filename(), allsprites, game_state)
     quitButton = Button(500, 350, 140, 40, ' Quit', quit, song.get_font_filename(), allsprites, game_state)
 
+    easyButton = Button(450, 250, 140, 40, ' Easy', select_difficulty, song.get_font_filename(), allsprites, game_state)
+    normalButton = Button(600, 250, 140, 40, ' Normal', select_difficulty, song.get_font_filename(), allsprites, game_state)
+    hardButton = Button(750, 250, 140, 40, ' Hard', select_difficulty, song.get_font_filename(), allsprites, game_state)
+
     # Main loop
     going = True
     while going:
@@ -64,11 +72,16 @@ def main():
 
         # This runs before the user starts the game
         if game_state.state == 'prestart':
+            
             for event in eventlist:
             # Checks if a mouse is clicked 
                 if event.type == pygame.MOUSEBUTTONDOWN: 
                     startButton.check_click()
                     quitButton.check_click()
+                    # Difficulty buttons
+                    easyButton.check_click()
+                    normalButton.check_click()
+                    hardButton.check_click()
 
         # This runs when the users starts a game
         elif game_state.state == 'playing':
@@ -93,6 +106,23 @@ def main():
                             button.wake()  # Set the button as available again
                             hitbox.unpunch()
 
+        # End state
+        elif game_state.state == 'end_game':
+            replayButton = Button(500, 500, 200, 45, ' Replay', game_state.restart, song.get_font_filename(), allsprites, game_state)
+            mainMenuButton = Button(650, 500, 200, 45, ' Main menu', game_state.menu_start, song.get_font_filename(), allsprites, game_state)
+            
+            top5 = score.get_top5_high_score()
+            screen.blit(img, (20, 20))
+            # [90, 70, 65, 60, 60]
+
+            for event in eventlist:
+                # Checks if a mouse is clicked 
+                if event.type == pygame.MOUSEBUTTONDOWN: 
+                    replayButton.check_click()
+                    mainMenuButton.check_click()
+                    quitButton.check_click()
+
+
         # This calls the update() function on all sprites
         allsprites.update()
         
@@ -104,7 +134,6 @@ def main():
 
 def init_rpi_buttons(gpio_pin_numbers):
     # Initialize Raspberry Pi input pins
-    
     gpio_buttons = []
     
     from gpiozero import Button
@@ -122,6 +151,15 @@ def init_rpi_buttons(gpio_pin_numbers):
     print('The following pins are configured as (gpio) button inputs:', gpio_pins)
 
     return gpio_buttons
+
+def select_difficulty(diff):
+    print(f"diff: "+diff)
+    # if diff == "easy":
+    #     FallingNote.move = 10
+    # if diff == "normal":
+    #     FallingNote.move = 15
+    # if diff == "hard":
+    #     FallingNote.move = 20
 
 
 if __name__ == "__main__":
