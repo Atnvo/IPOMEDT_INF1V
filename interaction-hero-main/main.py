@@ -120,9 +120,14 @@ def main():
             mainMenuButton = Button(650, 500, 200, 45, ' Main menu', game_state.menu_start, song.get_font_filename(), allsprites, game_state)
             
             top5 = score.get_top5_high_score()
-            text_font.render_to(screen, (500, 200), "Score:", (153, 204, 255))
+            text_font.render_to(screen, (500, 200), "top 5 Score:", (0, 0, 0))
 
-            text_font.render_to(screen, (500, 250), str(score.get_score()), (153, 204, 255))
+            height = 250
+            for count, top in enumerate(top5):
+                h = height + 30 * count
+                text_font.render_to(screen, (500, h), str(top), (0, 0, 0))
+
+            # text_font.render_to(screen, (500, 250), "ss", (153, 204, 255))
             # [90, 70, 65, 60, 60]
 
             for event in eventlist:
