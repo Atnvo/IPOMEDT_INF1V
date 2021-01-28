@@ -120,7 +120,7 @@ class MusicPlayer():
         if default_output_id != -1:
             if utils.is_running_on_rpi():
                 # Setting output on 2 on RPi is required for using Timidity
-                self.player = pygame.midi.Output(2)
+                self.player = pygame.midi.Output(3)
             else:
                 self.player = pygame.midi.Output(default_output_id)
         else:

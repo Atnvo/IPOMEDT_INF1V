@@ -40,10 +40,10 @@ class GameState():
         # Define Hitboxes
         input_keys = ['a', 's', 'd', 'f']
         self.hitboxes = [
-            Hitbox('hitbox-example.png', 0, input_keys[0], self.allsprites),
-            Hitbox('hitbox-example.png', 1, input_keys[1], self.allsprites),
-            Hitbox('hitbox-example.png', 2, input_keys[2], self.allsprites),
-            Hitbox('hitbox-example.png', 3, input_keys[3], self.allsprites),
+            Hitbox('yin-yang.png', 0, input_keys[0], self.allsprites),
+            Hitbox('yin-yang.png', 1, input_keys[1], self.allsprites),
+            Hitbox('yin-yang.png', 2, input_keys[2], self.allsprites),
+            Hitbox('yin-yang.png', 3, input_keys[3], self.allsprites),
         ]
 
 
@@ -55,6 +55,8 @@ class GameState():
         self.music_player.restart()
 
     def drop_next_note_sprite(self, note):
+        
+        self.hitboxes
         self.note_dropper.drop(note, self.hitboxes)
 
 
@@ -93,7 +95,7 @@ class GameState():
     def menu_start(self):
         self.background_handler.update_background()
         self.state = 'prestart'
-        
+
     def check_for_hit(self, hitbox):
         if hitbox.hits():
             self.scoreHandler.change_score(10)

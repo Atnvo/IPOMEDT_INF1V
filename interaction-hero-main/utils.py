@@ -50,3 +50,4 @@ def is_running_on_rpi():
 
 def get_main_dir():
     return os.path.split(os.path.abspath(__file__))[0]
+    
